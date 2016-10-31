@@ -20,7 +20,8 @@ int main() {
 			help();
 		} else if (strstr(input, "minimount") != NULL) {
 
-			strncpy(imagePath, strstr(input, "minimount") + 10, strlen(strstr(input, "minimount") + 10));
+			strncpy(imagePath, strstr(input, "minimount") + 10,
+					strlen(strstr(input, "minimount") + 11));
 			imagePath[sizeof(imagePath) - 1] = '\0';
 
 			minimount(imagePath);
@@ -28,9 +29,23 @@ int main() {
 		} else if ((strstr(input, "miniunmount")) != NULL) {
 
 			miniunmount();
-		}
-		else{
-			char* helpMessage = "Invalid Command. \nPlease type help to see the list of available commands.\n";
+		} else if (strstr(input, "showsuper") != NULL) {
+
+			showsuper();
+
+		} else if (strstr(input, "traverse") != NULL) {
+
+			char* lSwitch = (char *) malloc(3);
+			lSwitch = strstr(input, "traverse") + 9;
+
+			if(strcmp(lSwitch, "-l\n") == 0)
+				traverse(1);
+			else
+				traverse(0);
+
+		} else {
+			char* helpMessage =
+					"Invalid Command. \nPlease type help to see the list of available commands.\n";
 			write(1, helpMessage, strlen(helpMessage));
 		}
 		free(input);
