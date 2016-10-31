@@ -43,6 +43,11 @@ int main() {
 			else
 				traverse(0);
 
+		} else if (strstr(input, "quit") != NULL) {
+			printf("\nYou will now quit out of the floppy disk shell.\n");
+			break;
+			
+			
 		} else {
 			char* helpMessage =
 					"Invalid Command. \nPlease type help to see the list of available commands.\n";
