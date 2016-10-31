@@ -8,7 +8,7 @@
 #include"minix.h"
 
 void help() {
-	char* help = "Print command descriptions\n"; //TODO for dequane
+	char* help = "Print command descriptions\n"; 
 	write(1, help, strlen(help));
     printf("1. help: Display available commands.\n");
     printf("2. minimount (fileName): Mount image file.\n");
