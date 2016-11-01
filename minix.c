@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <ctype.h>
+#include <string.h>
 #include"minix.h"
 
 void help() {
@@ -128,7 +130,7 @@ void traverse(int showMore) {
 				if (strcmp(dir->name, ".") != 0
 						&& strcmp(dir->name, "..") != 0) {
 
-					char* name = (char *)malloc(100);
+					char* name = (char *) malloc(100);
 					name = dir->name;
 
 					if (showMore == 1) {
@@ -161,8 +163,7 @@ void traverse(int showMore) {
 
 						write(1, stringToPrint, strlen(stringToPrint));
 						write(1, "\n", 1);
-					}
-					else{
+					} else {
 						write(1, name, strlen(name));
 						write(1, "\n", 1);
 					}
@@ -172,6 +173,18 @@ void traverse(int showMore) {
 	}
 
 	close(fd);
+}
+
+void showzone(char* zoneNumber) {
+
+	char imagePath[] = "imagefile.img";
+	char* buf = (char *) malloc(1024);
+
+	int fd = open(imagePath, O_RDONLY);
+	lseek(fd, BLOCK_SIZE * atoi(zoneNumber), SEEK_SET); //set pointer to the input zone block
+
+	read(fd, buf, 1024);
+	hexDump(buf, 1024);
 }
 
 //helper functions
@@ -279,6 +292,90 @@ void convertTime(int seconds, char* returnString) {
 
 }
 
+void hexDump(void *addr, int len) {
+	int i;
+
+	unsigned char *pc = (unsigned char*) addr;
+
+	char* temp = (char *) malloc(1);
+
+	write(1, "    ", 4);
+
+	for (i = 0; i < 10; i++) {
+		itoa(temp, i);
+		write(1, " ", 1);
+		write(1, temp, 1);
+		write(1, " ", 1);
+	}
+
+	char* c = (char *) malloc(1);
+
+	for (*c = 'a'; *c != 'g'; (*c)++) {
+		write(1, " ", 1);
+		write(1, c, 1);
+		write(1, " ", 1);
+	}
+
+	write(1, "\n", 1);
+	write(1, " 0  ", 4);
+	int h = 0x00;
+
+	for (i = 0; i < len - 1; i++) {
+
+		if (isprint(pc[i]) == 0) {
+			write(1, " ", 1);
+			write(1, " ", 1);
+			write(1, " ", 1);
+		} else {
+			char* c = (char *) malloc(1);
+			*c = pc[i];
+			write(1, " ", 1);
+			write(1, c, 1);
+			write(1, " ", 1);
+		}
+
+		temp = (char *) malloc(40);
+
+		if ((i != 0) && ((i + 1) % 16) == 0) {
+			write(1, "\n", 1);
+			h = h + 0x10;
+			dtoh(temp, h);
+			write(1, temp, strlen(temp));
+			if (strlen(temp) == 2)
+				write(1, "  ", 2);
+			else
+				write(1, " ", 1);
+		}
+	}
+
+	write(1, "\n", 1);
+}
+
+void dtoh(char* returnString, int d) {
+
+	int negate = 0;
+	if (d < 0) {
+		d = -d;
+		negate = 1;
+	}
+
+	int r, i = 0;
+	char hexDigits[] = "0123456789abcdef";
+
+	/* Convert Decimal Number to Hexadecimal Numbers */
+	while (d != 0) {
+		r = d % 16;
+		*(returnString + i) = hexDigits[r];
+		d /= 16;
+		i++;
+	}
+	*(returnString + i) = '\0';
+	returnString = strrev(returnString);
+
+	if (negate == 1)
+		returnString = negateHex(returnString);
+}
+
 void itoa(char *s, int x) {
 	char *p = s;
 
@@ -294,4 +391,37 @@ void itoa(char *s, int x) {
 		*s++ = *p;
 		*p = t;
 	}
+}
+
+char* strrev(char* str) {
+	char *p1, *p2;
+
+	if (!str || !*str)
+		return str;
+	for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2) {
+		*p1 ^= *p2;
+		*p2 ^= *p1;
+		*p1 ^= *p2;
+	}
+	return str;
+}
+
+char* negateHex(char* hex) {
+	int i;
+	char* returnString = (char *) malloc(strlen(hex));
+
+	char* hexs = "0123456789abcdef";
+
+	for (i = 0; i < strlen(hex); i++) {
+		char c = *(hex + i);
+		int index = (int) (strchr(hexs, c) - hexs);
+
+		if (index == 0)
+			*(returnString + i) = '0';
+		else
+			*(returnString + i) = *(hexs + (16 - index));
+	}
+
+	return returnString;
+
 }

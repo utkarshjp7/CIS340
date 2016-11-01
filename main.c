@@ -26,10 +26,11 @@ int main() {
 
 			minimount(imagePath);
 
-		} else if ((strstr(input, "miniunmount")) != NULL) {
+		} else if ((strstr(input, "miniunmount\n")) != NULL) {
 
 			miniunmount();
-		} else if (strstr(input, "showsuper") != NULL) {
+
+		} else if (strstr(input, "showsuper\n") != NULL) {
 
 			showsuper();
 
@@ -38,10 +39,20 @@ int main() {
 			char* lSwitch = (char *) malloc(3);
 			lSwitch = strstr(input, "traverse") + 9;
 
-			if(strcmp(lSwitch, "-l\n") == 0)
+			if (strcmp(lSwitch, "-l\n") == 0)
 				traverse(1);
 			else
 				traverse(0);
+
+		} else if (strstr(input, "showzone") != NULL) {
+
+			char* zone = (char *)malloc(5);
+
+			strncpy(zone, strstr(input, "showzone") + 9,
+					strlen(strstr(input, "showzone") + 10));
+			zone[sizeof(zone) - 1] = '\0';
+
+			showzone(zone);
 
 		} else {
 			char* helpMessage =

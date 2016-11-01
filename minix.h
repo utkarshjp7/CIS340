@@ -52,11 +52,16 @@ void minimount(char imageFilePath[]);
 void miniunmount();
 void showsuper();
 void traverse(int showMore);
+void showzone(char* zoneNumber);
 
 //helper functions
 void itoa(char *s, int x);
 void processImode(int a, char* returnString);
 void processPermissionBytes(char* permissionBytes, char* returnString);
 void convertTime(int seconds, char* returnString);
+void hexDump (void *addr, int len);
+void dtoh(char* returnString, int d);
+char* strrev(char *str);
+char* negateHex(char* hex);
 
 #endif /* MINIX_H_ */
