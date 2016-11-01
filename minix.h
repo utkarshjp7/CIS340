@@ -14,6 +14,7 @@
 
 //Shared Global Variable
 extern char* imagePath;
+extern int isMounted;
 
 //struct
 

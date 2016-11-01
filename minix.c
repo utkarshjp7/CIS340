@@ -10,173 +10,193 @@
 #include"minix.h"
 
 void help() {
-	char* help = "Print command descriptions\n"; 
-	write(1, help, strlen(help));
-    	write(1, "1. help: Display available commands.\n", 37);
-    	write(1, "2. minimount (fileName): Mount image file.\n", 43);
-  	write(1, "3. miniumount: Unmount the mounted floppy disk.\n", 48);
-    	write(1, "4. showsuper: List information of super block.\n", 47);
-    	write(1, "5. traverse [-l]: Show the contents in the root directory. Optional -l flag gives detailed information of the root directory.\n", 126);
-    	write(1, "6. showzone (zone_number): Show ASCII content of zone (zone_number).\n", 69);
-    	write(1, "7. showfile (filename): Show content of target file.\n", 53);	
-    	write(1, "8. quit: Quit the minix shell.\n", 30);
- 	//free(help);
+
+	write(1, "1. help: Display available commands.\n", 37);
+	write(1, "2. minimount (fileName): Mount image file.\n", 43);
+	write(1, "3. miniumount: Unmount the mounted floppy disk.\n", 48);
+	write(1, "4. showsuper: List information of super block.\n", 47);
+	write(1,
+			"5. traverse [-l]: Show the contents in the root directory. Optional -l flag gives detailed information of the root directory.\n",
+			126);
+	write(1,
+			"6. showzone (zone_number): Show ASCII content of zone (zone_number).\n",
+			69);
+	write(1, "7. showfile (filename): Show content of target file.\n", 53);
+	write(1, "8. quit: Quit the minix shell.\n", 31);
+
+	return;
 }
 
 void showsuper() {
-	char* buf = (char *) malloc(BLOCK_SIZE);
 
-	int fd = open(imagePath, O_RDONLY);
-	lseek(fd, 1024, SEEK_SET);
-	read(fd, buf, BLOCK_SIZE); //1024 to 2047 //2nd block
-	struct minix_super_block* super = (struct minix_super_block *) buf;
+	if (isMounted == 1) {
+		char* buf = (char *) malloc(BLOCK_SIZE);
 
-	char* temp = (char *) malloc(4);
-	write(1, "number of inodes: 	", 19);
-	itoa(temp, super->s_ninodes);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		int fd = open(imagePath, O_RDONLY);
+		lseek(fd, 1024, SEEK_SET);
+		read(fd, buf, BLOCK_SIZE); //1024 to 2047 //2nd block
+		struct minix_super_block* super = (struct minix_super_block *) buf;
 
-	temp = (char *) malloc(4);
-	write(1, "number of zones: 	", 18);
-	itoa(temp, super->s_nzones);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		char* temp = (char *) malloc(4);
+		write(1, "number of inodes: 	", 19);
+		itoa(temp, super->s_ninodes);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "number of imap_blocks: 	", 24);
-	itoa(temp, super->s_imap_blocks);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "number of zones: 	", 18);
+		itoa(temp, super->s_nzones);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "number of zmap_blocks: 	", 24);
-	itoa(temp, super->s_zmap_blocks);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "number of imap_blocks: 	", 24);
+		itoa(temp, super->s_imap_blocks);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "first data zone: 	", 18);
-	itoa(temp, super->s_firstdatazone);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "number of zmap_blocks: 	", 24);
+		itoa(temp, super->s_zmap_blocks);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "log zone size: 	        ", 24);
-	itoa(temp, super->s_log_zone_size);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "first data zone: 	", 18);
+		itoa(temp, super->s_firstdatazone);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "max size: 	        ", 19);
-	itoa(temp, super->s_max_size);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "log zone size: 	        ", 24);
+		itoa(temp, super->s_log_zone_size);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "magic: 	                ", 24);
-	itoa(temp, super->s_magic);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "max size: 	        ", 19);
+		itoa(temp, super->s_max_size);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "state: 	                ", 24);
-	itoa(temp, super->s_state);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "magic: 	                ", 24);
+		itoa(temp, super->s_magic);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	temp = (char *) malloc(4);
-	write(1, "zones: 	                ", 24);
-	itoa(temp, super->s_zones);
-	write(1, temp, 4);
-	write(1, "\n", 1);
+		temp = (char *) malloc(4);
+		write(1, "state: 	                ", 24);
+		itoa(temp, super->s_state);
+		write(1, temp, 4);
+		write(1, "\n", 1);
 
-	close(fd);
+		temp = (char *) malloc(4);
+		write(1, "zones: 	                ", 24);
+		itoa(temp, super->s_zones);
+		write(1, temp, 4);
+		write(1, "\n", 1);
+
+		close(fd);
+	} else
+		write(1, "Please mount minix image file before executing this command.",
+				60);
 }
 
 void traverse(int showMore) {
+	if (isMounted == 1) {
 
-	char* buf = (char *) malloc(32);
-	char* buf2 = (char *) malloc(32);
+		char* buf = (char *) malloc(32);
+		char* buf2 = (char *) malloc(32);
 
-	struct minix_dir_entry* dir;
-	int fd = open(imagePath, O_RDONLY);
+		struct minix_dir_entry* dir;
+		int fd = open(imagePath, O_RDONLY);
 
-	lseek(fd, BLOCK_SIZE * 5, SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
-	read(fd, buf, 32); 		   //read root inode
-	struct minix_inode* rootInode = (struct minix_inode *) buf;
-	free(buf);
+		lseek(fd, BLOCK_SIZE * 5, SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
+		read(fd, buf, 32); 		   //read root inode
+		struct minix_inode* rootInode = (struct minix_inode *) buf;
+		free(buf);
 
-	buf = (char *) malloc(16);
-	int i, j;
+		buf = (char *) malloc(16);
+		int i, j;
 
-	for (i = 0; i < 7; i++) { //loop through every zone
-		for (j = 0; j < BLOCK_SIZE; j = j + 16) { //loop through every two byte in each block
-			if (rootInode->i_zone[i] == '\0')
-				break;
-			else
-				lseek(fd, (rootInode->i_zone[i] * BLOCK_SIZE) + j, SEEK_SET); //set pointer to the begining of data block
+		for (i = 0; i < 7; i++) { //loop through every zone
+			for (j = 0; j < BLOCK_SIZE; j = j + 16) { //loop through every two byte in each block
+				if (rootInode->i_zone[i] == '\0')
+					break;
+				else
+					lseek(fd, (rootInode->i_zone[i] * BLOCK_SIZE) + j,
+							SEEK_SET); //set pointer to the begining of data block
 
-			read(fd, buf, 16);
-			if (strlen(buf) > 0) {
-				dir = (struct minix_dir_entry *) buf;
-				if (strcmp(dir->name, ".") != 0
-						&& strcmp(dir->name, "..") != 0) {
+				read(fd, buf, 16);
+				if (strlen(buf) > 0) {
+					dir = (struct minix_dir_entry *) buf;
+					if (strcmp(dir->name, ".") != 0
+							&& strcmp(dir->name, "..") != 0) {
 
-					char* name = (char *) malloc(100);
-					name = dir->name;
+						char* name = (char *) malloc(100);
+						name = dir->name;
 
-					if (showMore == 1) {
-						int pointer = (BLOCK_SIZE * 5) + (dir->inode - 1) * 32;
-						lseek(fd, pointer, SEEK_SET);
-						read(fd, buf2, 32);
-						struct minix_inode* inode = (struct minix_inode *) buf2;
+						if (showMore == 1) {
+							int pointer = (BLOCK_SIZE * 5)
+									+ (dir->inode - 1) * 32;
+							lseek(fd, pointer, SEEK_SET);
+							read(fd, buf2, 32);
+							struct minix_inode* inode =
+									(struct minix_inode *) buf2;
 
-						char* stringToPrint = (char *) malloc(100);
-						char* temp = (char *) malloc(8);
+							char* stringToPrint = (char *) malloc(100);
+							char* temp = (char *) malloc(8);
 
-						processImode(inode->i_mode, stringToPrint); //permission bytes and file type
+							processImode(inode->i_mode, stringToPrint); //permission bytes and file type
 
-						strcat(stringToPrint, " ");
+							strcat(stringToPrint, " ");
 
-						itoa(temp, inode->i_uid);
-						strcat(stringToPrint, temp); //user id
-						strcat(stringToPrint, " ");
+							itoa(temp, inode->i_uid);
+							strcat(stringToPrint, temp); //user id
+							strcat(stringToPrint, " ");
 
-						temp = (char *) malloc(4);
-						itoa(temp, inode->i_size);
-						strcat(stringToPrint, temp); //file size
-						strcat(stringToPrint, " ");
+							temp = (char *) malloc(4);
+							itoa(temp, inode->i_size);
+							strcat(stringToPrint, temp); //file size
+							strcat(stringToPrint, " ");
 
-						temp = (char *) malloc(12);
-						convertTime(inode->i_time, temp);
-						strcat(stringToPrint, temp);
-						strcat(stringToPrint, " ");
-						strcat(stringToPrint, name);
+							temp = (char *) malloc(12);
+							convertTime(inode->i_time, temp);
+							strcat(stringToPrint, temp);
+							strcat(stringToPrint, " ");
+							strcat(stringToPrint, name);
 
-						write(1, stringToPrint, strlen(stringToPrint));
-						write(1, "\n", 1);
-					} else {
-						write(1, name, strlen(name));
-						write(1, "\n", 1);
+							write(1, stringToPrint, strlen(stringToPrint));
+							write(1, "\n", 1);
+						} else {
+							write(1, name, strlen(name));
+							write(1, "\n", 1);
+						}
 					}
 				}
 			}
 		}
-	}
 
-	close(fd);
+		close(fd);
+	} else
+		write(1, "Please mount minix image file before executing this command.",
+				60);
 }
 
 void showzone(char* zoneNumber) {
 
-	char* buf = (char *) malloc(1024);
+	if (isMounted == 1) {
+		char* buf = (char *) malloc(1024);
 
-	int fd = open(imagePath, O_RDONLY);
-	lseek(fd, BLOCK_SIZE * atoi(zoneNumber), SEEK_SET); //set pointer to the input zone block
+		int fd = open(imagePath, O_RDONLY);
+		lseek(fd, BLOCK_SIZE * atoi(zoneNumber), SEEK_SET); //set pointer to the input zone block
 
-	read(fd, buf, 1024);
-	hexDump(buf, 1024);
+		read(fd, buf, 1024);
+		hexDump(buf, 1024);
+	} else
+		write(1, "Please mount minix image file before executing this command.",
+				60);
 }
 
 //helper functions

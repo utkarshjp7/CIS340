@@ -5,26 +5,38 @@
 #include "minix.h"
 
 char* imagePath;
+int isMounted = 0;
 
 int main() {
 
 	char *welcome = "Welcome to the minix console\n";
 	write(1, welcome, strlen(welcome));
 
+	char* input;
+
 	while (1) {
-		char *input = (char *) malloc(100000);
+		input = (char *) calloc(10000, 1);
+
 		write(1, "minix>>", 7);
-		read(0, input, 100000);
+		read(0, input, 10000);
 
 		if (strcmp(input, "help\n") == 0) {
 			help();
 		} else if (strstr(input, "minimount") != NULL) {
+
 			imagePath = (char *)malloc(265);
 			strncpy(imagePath, strstr(input, "minimount") + 10,
 					strlen(strstr(input, "minimount") + 11));
 
+			if( access( imagePath, F_OK ) != -1 ) {
+			    isMounted = 1;
+			} else {
+			    write(1, "File does not exist at that location\n", 37);
+			}
+
 		} else if ((strstr(input, "miniunmount\n")) != NULL) {
 
+			isMounted = 0;
 			free(imagePath);
 
 		} else if (strstr(input, "showsuper\n") != NULL) {
@@ -52,8 +64,10 @@ int main() {
 			showzone(zone);
 
 		} else if (strstr(input, "quit") != NULL) {
-			write(1, "\nYou will now quit out of the floppy disk shell.\n", 49);
-			break;
+			write(1, "\nYou will now quit out of the minix shell.\n", 42);
+			free(input);
+			input = NULL;
+			return 0;
 			
 		} else {
 			char* helpMessage =
@@ -61,6 +75,7 @@ int main() {
 			write(1, helpMessage, strlen(helpMessage));
 		}
 		free(input);
+		input = NULL;
 	}
 
 	free(welcome);
