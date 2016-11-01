@@ -12,31 +12,31 @@
 void help() {
 	char* help = "Print command descriptions\n"; 
 	write(1, help, strlen(help));
-    printf("1. help: Display available commands.\n");
-    printf("2. minimount (fileName): Mount image file.\n");
-    printf("3. miniumount: Unmount the mounted floppy disk. \n");
-    printf("4. showsuper: List information of super block.\n");
-    printf("5. traverse [-l]: Show the contents in the root directory. Optional -l flag gives detailed information of the root directory.\n");
-    printf("6. showzone (zone_number): Show ASCII content of zone (zone_number).\n");
-    printf("7. showfile (filename): Show content of target file. \n");	
-    printf("8. quit: Quit the minix shell. \n");
+    	write(1, "1. help: Display available commands.\n", 37);
+    	write(1, "2. minimount (fileName): Mount image file.\n", 43);
+  	write(1, "3. miniumount: Unmount the mounted floppy disk.\n", 48);
+    	write(1, "4. showsuper: List information of super block.\n", 47);
+    	write(1, "5. traverse [-l]: Show the contents in the root directory. Optional -l flag gives detailed information of the root directory.\n", 126);
+    	write(1, "6. showzone (zone_number): Show ASCII content of zone (zone_number).\n", 69);
+    	write(1, "7. showfile (filename): Show content of target file.\n", 53);	
+    	write(1, "8. quit: Quit the minix shell.\n", 30);
  	//free(help);
 }
 
 void minimount(char x[]) {
-printf("Mounting disk..\n");
+	write(1, "Mounting disk..\n", 16);
 	write(1, x, strlen(x));
-	mount(*x, trgt);
-	printf("The disk has been mounted.\n");
+	system(mount(*x, trgt));
+	write(1, "The disk has been mounted.\n", 127);
 	
 }
 
 void miniunmount() {
 //use imagePath global variable to unmount the disk
 	write(1, imagePath, strlen(imagePath));
-	printf("The disk will now be unmounted.\n");
-	unmount(imagePath);
-	printf("Unmount successful.\n");
+	write(1, "The disk will now be unmounted.\n", 32);
+	system(unmount(imagePath));
+	write(1, "Unmount successful.\n", 20);
 }
 
 void showsuper() {
