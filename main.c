@@ -30,6 +30,7 @@ int main() {
 
 			if( access( imagePath, F_OK ) != -1 ) {
 			    isMounted = 1;
+				write(1, "Disk mounted.\n", 14);
 			} else {
 			    write(1, "File does not exist at that location\n", 37);
 			}
@@ -38,6 +39,7 @@ int main() {
 
 			isMounted = 0;
 			free(imagePath);
+			write(1, "Disk unmounted.\n", 16); 
 
 		} else if (strstr(input, "showsuper\n") != NULL) {
 
