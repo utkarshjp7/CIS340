@@ -55,7 +55,7 @@ int main() {
 			showzone(zone);
 
 		} else if (strstr(input, "quit") != NULL) {
-			printf("\nYou will now quit out of the floppy disk shell.\n");
+			write(1, "\nYou will now quit out of the floppy disk shell.\n", 49);
 			break;
 			
 		} else {
