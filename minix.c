@@ -22,15 +22,19 @@ void help() {
 }
 
 void minimount(char x[]) {
-	//TODO for dequane
+printf("Mounting disk..\n");
 	write(1, x, strlen(x));
+	mount(*x, trgt);
+	printf("The disk has been mounted.\n");
+	
 }
 
 void miniunmount() {
 //use imagePath global variable to unmount the disk
-
-//TODO for dequane
 	write(1, imagePath, strlen(imagePath));
+	printf("The disk will now be unmounted.\n");
+	unmount(imagePath);
+	printf("Unmount successful.\n");
 }
 
 void showsuper() {
