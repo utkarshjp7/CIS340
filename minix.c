@@ -10,22 +10,33 @@
 #include"minix.h"
 
 void help() {
-	char* help = "Print command descriptions\n"; //TODO for dequane
+	char* help = "Print command descriptions\n"; 
 	write(1, help, strlen(help));
-
-	//free(help);
+    printf("1. help: Display available commands.\n");
+    printf("2. minimount (fileName): Mount image file.\n");
+    printf("3. miniumount: Unmount the mounted floppy disk. \n");
+    printf("4. showsuper: List information of super block.\n");
+    printf("5. traverse [-l]: Show the contents in the root directory. Optional -l flag gives detailed information of the root directory.\n");
+    printf("6. showzone (zone_number): Show ASCII content of zone (zone_number).\n");
+    printf("7. showfile (filename): Show content of target file. \n");	
+    printf("8. quit: Quit the minix shell. \n");
+ 	//free(help);
 }
 
 void minimount(char x[]) {
-	//TODO for dequane
+printf("Mounting disk..\n");
 	write(1, x, strlen(x));
+	mount(*x, trgt);
+	printf("The disk has been mounted.\n");
+	
 }
 
 void miniunmount() {
 //use imagePath global variable to unmount the disk
-
-//TODO for dequane
 	write(1, imagePath, strlen(imagePath));
+	printf("The disk will now be unmounted.\n");
+	unmount(imagePath);
+	printf("Unmount successful.\n");
 }
 
 void showsuper() {
