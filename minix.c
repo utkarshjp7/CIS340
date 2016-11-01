@@ -24,6 +24,7 @@ void help() {
 }
 
 void minimount(char x[]) {
+	const char* trgt = "/tmp";
 	write(1, "Mounting disk..\n", 16);
 	write(1, x, strlen(x));
 	system(mount(*x, trgt));
