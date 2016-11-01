@@ -23,26 +23,9 @@ void help() {
  	//free(help);
 }
 
-void minimount(char x[]) {
-	write(1, "Mounting disk..\n", 16);
-	write(1, x, strlen(x));
-	system(mount(*x, trgt));
-	write(1, "The disk has been mounted.\n", 127);
-	
-}
-
-void miniunmount() {
-//use imagePath global variable to unmount the disk
-	write(1, imagePath, strlen(imagePath));
-	write(1, "The disk will now be unmounted.\n", 32);
-	system(unmount(imagePath));
-	write(1, "Unmount successful.\n", 20);
-}
-
 void showsuper() {
 	char* buf = (char *) malloc(BLOCK_SIZE);
 
-	char imagePath[] = "imagefile.img";
 	int fd = open(imagePath, O_RDONLY);
 	lseek(fd, 1024, SEEK_SET);
 	read(fd, buf, BLOCK_SIZE); //1024 to 2047 //2nd block
@@ -113,7 +96,6 @@ void showsuper() {
 
 void traverse(int showMore) {
 
-	char imagePath[] = "imagefile.img";
 	char* buf = (char *) malloc(32);
 	char* buf2 = (char *) malloc(32);
 
@@ -188,7 +170,6 @@ void traverse(int showMore) {
 
 void showzone(char* zoneNumber) {
 
-	char imagePath[] = "imagefile.img";
 	char* buf = (char *) malloc(1024);
 
 	int fd = open(imagePath, O_RDONLY);

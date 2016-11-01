@@ -4,7 +4,7 @@
 #include <string.h>
 #include "minix.h"
 
-char imagePath[100];
+char* imagePath;
 
 int main() {
 
@@ -19,16 +19,13 @@ int main() {
 		if (strcmp(input, "help\n") == 0) {
 			help();
 		} else if (strstr(input, "minimount") != NULL) {
-
+			imagePath = (char *)malloc(265);
 			strncpy(imagePath, strstr(input, "minimount") + 10,
 					strlen(strstr(input, "minimount") + 11));
-			imagePath[sizeof(imagePath) - 1] = '\0';
-
-			minimount(imagePath);
 
 		} else if ((strstr(input, "miniunmount\n")) != NULL) {
 
-			miniunmount();
+			free(imagePath);
 
 		} else if (strstr(input, "showsuper\n") != NULL) {
 

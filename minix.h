@@ -13,7 +13,7 @@
 #define DAYS_IN_FOUR_YEARS 1461
 
 //Shared Global Variable
-extern char imagePath[];
+extern char* imagePath;
 
 //struct
 
@@ -48,8 +48,6 @@ struct minix_dir_entry
 };
 
 void help();
-void minimount(char imageFilePath[]);
-void miniunmount();
 void showsuper();
 void traverse(int showMore);
 void showzone(char* zoneNumber);
