@@ -52,6 +52,7 @@ void help();
 void showsuper();
 void traverse(int showMore);
 void showzone(char* zoneNumber);
+void showfile(char* fileName);
 
 //helper functions
 void itoa(char *s, int x);

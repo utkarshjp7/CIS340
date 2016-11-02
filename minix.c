@@ -126,7 +126,7 @@ void traverse(int showMore) {
 					break;
 				else
 					lseek(fd, (rootInode->i_zone[i] * BLOCK_SIZE) + j,
-							SEEK_SET); //set pointer to the begining of data block
+					SEEK_SET); //set pointer to the begining of data block
 
 				read(fd, buf, 16);
 				if (strlen(buf) > 0) {
@@ -197,6 +197,78 @@ void showzone(char* zoneNumber) {
 	} else
 		write(1, "Please mount minix image file before executing this command.",
 				60);
+}
+
+void showfile(char* fileName) {
+
+	char* buf = (char *) malloc(32);
+	int inodeNum;
+	int isFound = 0;
+
+	struct minix_dir_entry* dir;
+	int fd = open(imagePath, O_RDONLY);
+
+	lseek(fd, BLOCK_SIZE * 5, SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
+	read(fd, buf, 32); 		   //read root inode
+	struct minix_inode* rootInode = (struct minix_inode *) buf;
+
+	free(buf);
+	buf = (char *) malloc(16);
+	int i, j;
+
+	for (i = 0; i < 7; i++) { //loop through every zone
+		for (j = 0; j < BLOCK_SIZE; j = j + 16) { //loop through every two byte in each block
+			if (rootInode->i_zone[i] == '\0')
+				break;
+			else
+				lseek(fd, (rootInode->i_zone[i] * BLOCK_SIZE) + j,
+				SEEK_SET); //set pointer to the begining of data block
+
+			read(fd, buf, 16);
+			if (strlen(buf) > 0) {
+				dir = (struct minix_dir_entry *) buf;
+
+				char* name = (char *) malloc(100);
+				name = dir->name;
+
+				if (strcmp(fileName, name) == 0) {
+					inodeNum = dir->inode;
+					isFound = 1;
+				}
+			}
+		}
+	}
+	printf("Inode Number: %d\n", inodeNum);
+	fflush(stdout);
+
+	free(buf);
+	buf = (char *) malloc(1024);
+	char* buf2 = (char *) malloc(1);
+
+	if (isFound == 1) {
+		lseek(fd, (BLOCK_SIZE * 5) + ((inodeNum - 1) * 32), SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
+		read(fd, buf, 32); 		   //read inode
+		struct minix_inode* inode = (struct minix_inode *) buf;
+
+		for (i = 0; i < 7; i++) { //loop through every zone
+			if (inode->i_zone[i] == '\0')
+				break;
+
+			lseek(fd, (inode->i_zone[i] * BLOCK_SIZE), SEEK_SET); //set pointer to the begining of data block
+			//read(fd, buf, 1024);
+
+			for (j = 0; j < BLOCK_SIZE; j++) { //loop through every two byte in each block
+				read(fd, buf2, 1);
+				printf("%02x ", (unsigned int) (unsigned char) buf2[0]);
+
+				if (((j + 1) % 16) == 0)
+					printf("\n");
+			}
+		}
+	}
+	fflush(stdout);
+	free(buf);
+	buf = NULL;
 }
 
 //helper functions
@@ -306,10 +378,8 @@ void convertTime(int seconds, char* returnString) {
 
 void hexDump(void *addr, int len) {
 	int i;
-
-	unsigned char *pc = (unsigned char*) addr;
-
 	char* temp = (char *) malloc(1);
+	char* c = (char *) malloc(1);
 
 	write(1, "    ", 4);
 
@@ -320,8 +390,6 @@ void hexDump(void *addr, int len) {
 		write(1, " ", 1);
 	}
 
-	char* c = (char *) malloc(1);
-
 	for (*c = 'a'; *c != 'g'; (*c)++) {
 		write(1, " ", 1);
 		write(1, c, 1);
@@ -330,7 +398,10 @@ void hexDump(void *addr, int len) {
 
 	write(1, "\n", 1);
 	write(1, " 0  ", 4);
+
 	int h = 0x00;
+
+	unsigned char *pc = (unsigned char*) addr;
 
 	for (i = 0; i < len - 1; i++) {
 
@@ -350,6 +421,7 @@ void hexDump(void *addr, int len) {
 
 		if ((i != 0) && ((i + 1) % 16) == 0) {
 			write(1, "\n", 1);
+
 			h = h + 0x10;
 			dtoh(temp, h);
 			write(1, temp, strlen(temp));
