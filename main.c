@@ -24,7 +24,7 @@ int main() {
 			help();
 		} else if (strstr(input, "minimount") != NULL) {
 
-			imagePath = (char *)malloc(265);
+			imagePath = (char *)calloc(265, 1);
 			strncpy(imagePath, strstr(input, "minimount") + 10,
 					strlen(strstr(input, "minimount") + 11));
 
@@ -47,7 +47,7 @@ int main() {
 
 		} else if (strstr(input, "traverse") != NULL) {
 
-			char* lSwitch = (char *) malloc(3);
+			char* lSwitch = (char *) calloc(3, 1);
 			lSwitch = strstr(input, "traverse") + 9;
 
 			if (strcmp(lSwitch, "-l\n") == 0)
@@ -57,7 +57,7 @@ int main() {
 
 		} else if (strstr(input, "showzone") != NULL) {
 
-			char* zone = (char *)malloc(5);
+			char* zone = (char *)calloc(5, 1);
 
 			strncpy(zone, strstr(input, "showzone") + 9,
 					strlen(strstr(input, "showzone") + 10));
@@ -67,7 +67,7 @@ int main() {
 
 		} else if (strstr(input, "showfile") != NULL) {
 
-			char* fileName = (char *) malloc(265);
+			char* fileName = (char *) calloc(265, 1);
 			strncpy(fileName , strstr(input, "showfile") + 9,
 					strlen(strstr(input, "showfile") + 10));
 

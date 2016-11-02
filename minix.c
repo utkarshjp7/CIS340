@@ -11,18 +11,14 @@
 
 void help() {
 
-	write(1, "1. help: Display available commands.\n", 37);
-	write(1, "2. minimount (absolute path of image file): Mount image file.\n", 62);
-	write(1, "3. miniumount: Unmount the mounted floppy disk.\n", 48);
-	write(1, "4. showsuper: List information of super block.\n", 47);
-	write(1,
-			"5. traverse [-l]: Show the contents in the root directory. Optional -l flag gives detailed information of the root directory.\n",
-			126);
-	write(1,
-			"6. showzone (zone_number): Show ASCII content of zone (zone_number).\n",
-			69);
-	write(1, "7. showfile (file name): Show content of target file.\n", 54);
-	write(1, "8. quit: Quit the minix shell.\n", 31);
+	printf("1. help: Display available commands.\n");
+	printf("2. minimount (absolute path of image file): Mount image file.\n");
+	printf("3. miniumount: Unmount the mounted floppy disk.\n");
+	printf("4. showsuper: List information of super block.\n");
+	printf("5. traverse [-l]: Show the contents in the root directory. Optional -l flag gives detailed information of the root directory.\n");
+	printf("6. showzone (zone_number): Show ASCII content of zone (zone_number).\n");
+	printf("7. showfile (file name): Show content of target file.\n");
+	printf("8. quit: Quit the minix shell.\n");
 
 	return;
 }
@@ -30,68 +26,68 @@ void help() {
 void showsuper() {
 
 	if (isMounted == 1) {
-		char* buf = (char *) malloc(BLOCK_SIZE);
+		char* buf = (char *) calloc(BLOCK_SIZE, 1);
 
 		int fd = open(imagePath, O_RDONLY);
 		lseek(fd, 1024, SEEK_SET);
 		read(fd, buf, BLOCK_SIZE); //1024 to 2047 //2nd block
 		struct minix_super_block* super = (struct minix_super_block *) buf;
 
-		char* temp = (char *) malloc(4);
+		char* temp = (char *) calloc(4, 1);
 		write(1, "number of inodes: 	", 19);
 		itoa(temp, super->s_ninodes);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "number of zones: 	", 18);
 		itoa(temp, super->s_nzones);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "number of imap_blocks: 	", 24);
 		itoa(temp, super->s_imap_blocks);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "number of zmap_blocks: 	", 24);
 		itoa(temp, super->s_zmap_blocks);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "first data zone: 	", 18);
 		itoa(temp, super->s_firstdatazone);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "log zone size: 	        ", 24);
 		itoa(temp, super->s_log_zone_size);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "max size: 	        ", 19);
 		itoa(temp, super->s_max_size);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "magic: 	                ", 24);
 		itoa(temp, super->s_magic);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "state: 	                ", 24);
 		itoa(temp, super->s_state);
 		write(1, temp, 4);
 		write(1, "\n", 1);
 
-		temp = (char *) malloc(4);
+		temp = (char *) calloc(4, 1);
 		write(1, "zones: 	                ", 24);
 		itoa(temp, super->s_zones);
 		write(1, temp, 4);
@@ -107,8 +103,8 @@ void showsuper() {
 void traverse(int showMore) {
 	if (isMounted == 1) {
 
-		char* buf = (char *) malloc(32);
-		char* buf2 = (char *) malloc(32);
+		char* buf = (char *) calloc(32, 1);
+		char* buf2 = (char *) calloc(32, 1);
 
 		struct minix_dir_entry* dir;
 		int fd = open(imagePath, O_RDONLY);
@@ -118,7 +114,7 @@ void traverse(int showMore) {
 		struct minix_inode* rootInode = (struct minix_inode *) buf;
 		free(buf);
 
-		buf = (char *) malloc(16);
+		buf = (char *) calloc(16, 1);
 		int i, j;
 
 		for (i = 0; i < 7; i++) { //loop through every zone
@@ -135,7 +131,7 @@ void traverse(int showMore) {
 					if (strcmp(dir->name, ".") != 0
 							&& strcmp(dir->name, "..") != 0) {
 
-						char* name = (char *) malloc(100);
+						char* name = (char *) calloc(100, 1);
 						name = dir->name;
 
 						if (showMore == 1) {
@@ -146,8 +142,8 @@ void traverse(int showMore) {
 							struct minix_inode* inode =
 									(struct minix_inode *) buf2;
 
-							char* stringToPrint = (char *) malloc(100);
-							char* temp = (char *) malloc(8);
+							char* stringToPrint = (char *) calloc(100, 1);
+							char* temp = (char *) calloc(8, 1);
 
 							processImode(inode->i_mode, stringToPrint); //permission bytes and file type
 
@@ -157,12 +153,12 @@ void traverse(int showMore) {
 							strcat(stringToPrint, temp); //user id
 							strcat(stringToPrint, " ");
 
-							temp = (char *) malloc(4);
+							temp = (char *) calloc(4, 1);
 							itoa(temp, inode->i_size);
 							strcat(stringToPrint, temp); //file size
 							strcat(stringToPrint, " ");
 
-							temp = (char *) malloc(12);
+							temp = (char *) calloc(12, 1);
 							convertTime(inode->i_time, temp);
 							strcat(stringToPrint, temp);
 							strcat(stringToPrint, " ");
@@ -189,7 +185,7 @@ void traverse(int showMore) {
 void showzone(char* zoneNumber) {
 
 	if (isMounted == 1) {
-		char* buf = (char *) malloc(1024);
+		char* buf = (char *) calloc(1024, 1);
 
 		int fd = open(imagePath, O_RDONLY);
 		lseek(fd, BLOCK_SIZE * atoi(zoneNumber), SEEK_SET); //set pointer to the input zone block
@@ -206,7 +202,7 @@ void showzone(char* zoneNumber) {
 void showfile(char* fileName) {
 
 	if (isMounted == 1) {
-		char* buf = (char *) malloc(32);
+		char* buf = (char *) calloc(32, 1);
 		int inodeNum;
 		int isFound = 0;
 
@@ -218,7 +214,7 @@ void showfile(char* fileName) {
 		struct minix_inode* rootInode = (struct minix_inode *) buf;
 
 		free(buf);
-		buf = (char *) malloc(16);
+		buf = (char *) calloc(16, 1);
 		int i, j;
 
 		for (i = 0; i < 7; i++) { //loop through every zone
@@ -233,7 +229,7 @@ void showfile(char* fileName) {
 				if (strlen(buf) > 0) {
 					dir = (struct minix_dir_entry *) buf;
 
-					char* name = (char *) malloc(100);
+					char* name = (char *) calloc(100, 1);
 					name = dir->name;
 
 					if (strcmp(fileName, name) == 0) {
@@ -245,8 +241,8 @@ void showfile(char* fileName) {
 		}
 
 		free(buf);
-		buf = (char *) malloc(1024);
-		char* buf2 = (char *) malloc(1);
+		buf = (char *) calloc(1024, 1);
+		char* buf2 = (char *) calloc(1, 1);
 
 		if (isFound == 1) {
 			lseek(fd, (BLOCK_SIZE * 5) + ((inodeNum - 1) * 32), SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
@@ -286,8 +282,8 @@ void showfile(char* fileName) {
 
 void processImode(int a, char* returnString) {
 
-	char* binaryString = (char *) malloc(17);
-	char* permissionBytes = (char *) malloc(10);
+	char* binaryString = (char *) calloc(17, 1);
+	char* permissionBytes = (char *) calloc(10, 1);
 
 	binaryString = binaryString + 15;
 
@@ -331,8 +327,8 @@ void convertTime(int seconds, char* returnString) {
 	int year = 1970 + elpasedYears;
 
 	int daysInCurrentYear = ((elpasedDays % DAYS_IN_FOUR_YEARS) % 365) + 1;
-	char* month = (char *) malloc(4);
-	char* temp = (char *) malloc(8);
+	char* month = (char *) calloc(4, 1);
+	char* temp = (char *) calloc(8, 1);
 
 	int leap = 0;
 	if (year % 4 == 0)
@@ -389,8 +385,8 @@ void convertTime(int seconds, char* returnString) {
 
 void hexDump(void *addr, int len) {
 	int i;
-	char* temp = (char *) malloc(1);
-	char* c = (char *) malloc(1);
+	char* temp = (char *) calloc(1, 1);
+	char* c = (char *) calloc(1, 1);
 
 	write(1, "    ", 4);
 
@@ -421,14 +417,14 @@ void hexDump(void *addr, int len) {
 			write(1, " ", 1);
 			write(1, " ", 1);
 		} else {
-			char* c = (char *) malloc(1);
+			char* c = (char *) calloc(1, 1);
 			*c = pc[i];
 			write(1, " ", 1);
 			write(1, c, 1);
 			write(1, " ", 1);
 		}
 
-		temp = (char *) malloc(40);
+		temp = (char *) calloc(40, 1);
 
 		if ((i != 0) && ((i + 1) % 16) == 0) {
 			write(1, "\n", 1);
@@ -503,7 +499,7 @@ char* strrev(char* str) {
 
 char* negateHex(char* hex) {
 	int i;
-	char* returnString = (char *) malloc(strlen(hex));
+	char* returnString = (char *) calloc(strlen(hex), 1);
 
 	char* hexs = "0123456789abcdef";
 
