@@ -12,7 +12,7 @@
 void help() {
 
 	write(1, "1. help: Display available commands.\n", 37);
-	write(1, "2. minimount (fileName): Mount image file.\n", 43);
+	write(1, "2. minimount (absolute path of image file): Mount image file.\n", 62);
 	write(1, "3. miniumount: Unmount the mounted floppy disk.\n", 48);
 	write(1, "4. showsuper: List information of super block.\n", 47);
 	write(1,
@@ -21,7 +21,7 @@ void help() {
 	write(1,
 			"6. showzone (zone_number): Show ASCII content of zone (zone_number).\n",
 			69);
-	write(1, "7. showfile (filename): Show content of target file.\n", 53);
+	write(1, "7. showfile (file name): Show content of target file.\n", 54);
 	write(1, "8. quit: Quit the minix shell.\n", 31);
 
 	return;
@@ -99,8 +99,9 @@ void showsuper() {
 
 		close(fd);
 	} else
-		write(1, "Please mount minix image file before executing this command.",
-				60);
+		write(1,
+				"Please mount minix image file before executing this command.\n",
+				61);
 }
 
 void traverse(int showMore) {
@@ -180,8 +181,9 @@ void traverse(int showMore) {
 
 		close(fd);
 	} else
-		write(1, "Please mount minix image file before executing this command.",
-				60);
+		write(1,
+				"Please mount minix image file before executing this command.\n",
+				61);
 }
 
 void showzone(char* zoneNumber) {
@@ -193,82 +195,91 @@ void showzone(char* zoneNumber) {
 		lseek(fd, BLOCK_SIZE * atoi(zoneNumber), SEEK_SET); //set pointer to the input zone block
 
 		read(fd, buf, 1024);
+		//I thought we are not allowed to use printf function thats why things are little complicated
 		hexDump(buf, 1024);
 	} else
-		write(1, "Please mount minix image file before executing this command.",
-				60);
+		write(1,
+				"Please mount minix image file before executing this command.\n",
+				61);
 }
 
 void showfile(char* fileName) {
 
-	char* buf = (char *) malloc(32);
-	int inodeNum;
-	int isFound = 0;
+	if (isMounted == 1) {
+		char* buf = (char *) malloc(32);
+		int inodeNum;
+		int isFound = 0;
 
-	struct minix_dir_entry* dir;
-	int fd = open(imagePath, O_RDONLY);
+		struct minix_dir_entry* dir;
+		int fd = open(imagePath, O_RDONLY);
 
-	lseek(fd, BLOCK_SIZE * 5, SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
-	read(fd, buf, 32); 		   //read root inode
-	struct minix_inode* rootInode = (struct minix_inode *) buf;
+		lseek(fd, BLOCK_SIZE * 5, SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
+		read(fd, buf, 32); 		   //read root inode
+		struct minix_inode* rootInode = (struct minix_inode *) buf;
 
-	free(buf);
-	buf = (char *) malloc(16);
-	int i, j;
+		free(buf);
+		buf = (char *) malloc(16);
+		int i, j;
 
-	for (i = 0; i < 7; i++) { //loop through every zone
-		for (j = 0; j < BLOCK_SIZE; j = j + 16) { //loop through every two byte in each block
-			if (rootInode->i_zone[i] == '\0')
-				break;
-			else
-				lseek(fd, (rootInode->i_zone[i] * BLOCK_SIZE) + j,
-				SEEK_SET); //set pointer to the begining of data block
+		for (i = 0; i < 7; i++) { //loop through every zone
+			for (j = 0; j < BLOCK_SIZE; j = j + 16) { //loop through every two byte in each block
+				if (rootInode->i_zone[i] == '\0')
+					break;
+				else
+					lseek(fd, (rootInode->i_zone[i] * BLOCK_SIZE) + j,
+					SEEK_SET); //set pointer to the begining of data block
 
-			read(fd, buf, 16);
-			if (strlen(buf) > 0) {
-				dir = (struct minix_dir_entry *) buf;
+				read(fd, buf, 16);
+				if (strlen(buf) > 0) {
+					dir = (struct minix_dir_entry *) buf;
 
-				char* name = (char *) malloc(100);
-				name = dir->name;
+					char* name = (char *) malloc(100);
+					name = dir->name;
 
-				if (strcmp(fileName, name) == 0) {
-					inodeNum = dir->inode;
-					isFound = 1;
+					if (strcmp(fileName, name) == 0) {
+						inodeNum = dir->inode;
+						isFound = 1;
+					}
 				}
 			}
 		}
-	}
-	printf("Inode Number: %d\n", inodeNum);
-	fflush(stdout);
 
-	free(buf);
-	buf = (char *) malloc(1024);
-	char* buf2 = (char *) malloc(1);
+		free(buf);
+		buf = (char *) malloc(1024);
+		char* buf2 = (char *) malloc(1);
 
-	if (isFound == 1) {
-		lseek(fd, (BLOCK_SIZE * 5) + ((inodeNum - 1) * 32), SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
-		read(fd, buf, 32); 		   //read inode
-		struct minix_inode* inode = (struct minix_inode *) buf;
+		if (isFound == 1) {
+			lseek(fd, (BLOCK_SIZE * 5) + ((inodeNum - 1) * 32), SEEK_SET); //set pointer to the first inode block (i.e 5th block, i.e root inode)
+			read(fd, buf, 32); 		   //read inode
+			struct minix_inode* inode = (struct minix_inode *) buf;
 
-		for (i = 0; i < 7; i++) { //loop through every zone
-			if (inode->i_zone[i] == '\0')
-				break;
+			for (i = 0; i < 7; i++) { //loop through every zone
+				if (inode->i_zone[i] == '\0')
+					break;
 
-			lseek(fd, (inode->i_zone[i] * BLOCK_SIZE), SEEK_SET); //set pointer to the begining of data block
-			//read(fd, buf, 1024);
+				lseek(fd, (inode->i_zone[i] * BLOCK_SIZE), SEEK_SET); //set pointer to the begining of data block
+				//read(fd, buf, 1024);
 
-			for (j = 0; j < BLOCK_SIZE; j++) { //loop through every two byte in each block
-				read(fd, buf2, 1);
-				printf("%02x ", (unsigned int) (unsigned char) buf2[0]);
+				for (j = 0; j < BLOCK_SIZE; j++) { //loop through every two byte in each block
+					read(fd, buf2, 1);
+					printf("%02x ", (unsigned int) (unsigned char) buf2[0]);
 
-				if (((j + 1) % 16) == 0)
-					printf("\n");
+					if (((j + 1) % 16) == 0)
+						printf("\n");
+				}
 			}
+		} else {
+			printf("File does not exist\n");
 		}
-	}
-	fflush(stdout);
-	free(buf);
-	buf = NULL;
+
+		fflush(stdout);
+		free(buf);
+		buf = NULL;
+	} else
+		write(1,
+				"Please mount minix image file before executing this command.\n",
+				61);
+
 }
 
 //helper functions

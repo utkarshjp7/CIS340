@@ -35,7 +35,7 @@ int main() {
 			    write(1, "File does not exist at that location\n", 37);
 			}
 
-		} else if ((strstr(input, "miniunmount\n")) != NULL) {
+		} else if ((strstr(input, "miniumount\n")) != NULL) {
 
 			isMounted = 0;
 			free(imagePath);
@@ -65,8 +65,16 @@ int main() {
 
 			showzone(zone);
 
+		} else if (strstr(input, "showfile") != NULL) {
+
+			char* fileName = (char *) malloc(265);
+			strncpy(fileName , strstr(input, "showfile") + 9,
+					strlen(strstr(input, "showfile") + 10));
+
+			showfile(fileName);
+
 		} else if (strstr(input, "quit") != NULL) {
-			write(1, "\nYou will now quit out of the minix shell.\n", 42);
+			write(1, "\nYou will now quit out of the minix shell.\n", 43);
 			free(input);
 			input = NULL;
 			return 0;
